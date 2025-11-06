@@ -1,5 +1,7 @@
 import { getRowsFromSheet } from "../../../shared/utils/gSheet"
 import { serverSupabaseServiceRole } from '#supabase/server'
+import type { Client } from "../../../shared/types/clients"
+
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -12,11 +14,15 @@ export default defineEventHandler(async (event) => {
   const sheetId = "1mu34D33RpZ8cX2Q2BJh8GdfBeGrBydBT1w7VHUHfon4"
 
   // Initialization of the variables expected to receive data from API call
-  let indexData, qminData, clientsData, supabaseClients
+  let indexData: string[][] | undefined = []
+  let qminData: string[][] | undefined = []
+  let clientsData: string[][] | undefined = []
+  let supabaseClients: { data: string[] } | undefined = { data: [] }
 
   // Initialization of the variables that will contain the data to be sent to Supabase
-  let newIndexRows, newQminRows, newClients, newClientsPds: string[] = []
+  let newIndexRows: any[] = [], newQminRows: any[] = [], newClients: any[] = [], newClientsPds: string[] = []
 
+  console.log('Server route running')
   // Fetch Google Sheet & Supabase to get all the data we need
   try {
     [indexData, qminData, clientsData, supabaseClients] = await Promise.all([
@@ -27,11 +33,19 @@ export default defineEventHandler(async (event) => {
         .from('clients')
         .select('pds')
         .then(result => ({
-          ...result,
-          data: result.data?.map(client => client.pds) || []
+          ...result as unknown as Client[],
+          data: result.data?.map((client: Client) => client.pds) || []
         }))
     ])
+
     console.log('Successfully fetched the whole data')
+    console.log('-----------------------------------------')
+    console.log('Index length from GSheet :', indexData?.length)
+    console.log('Qmin length from GSheet :', qminData?.length)
+    console.log('Clients length from GSheet :', clientsData?.length)
+    console.log('Clients length from Supabase :', supabaseClients?.data?.length)
+    console.log('-----------------------------------------')
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.log('Failed to fetch the whole data:', errorMessage)
@@ -40,6 +54,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: `Failed to fetch the whole data: ${errorMessage}`
     })
   }
+
 
   // Date formatting functions
   const startOfDaysAgo = (days: number): Date => {
@@ -84,6 +99,8 @@ export default defineEventHandler(async (event) => {
       return !supabaseClients.data.includes(client[0])
     })
 
+    console.log('Number of clients to be inserted in Supabase:', newClients?.length)
+
     if (newClients) {
       newClients = newClients.map(client => {
         return {
@@ -118,7 +135,7 @@ export default defineEventHandler(async (event) => {
     // Find index data for existing clients
     newIndexRows = indexData.filter(index => {
       const indexDate = formatDateWithTime(index[1])
-      return supabaseClients.data.includes(index[0]) && indexDate.getTime() >= startOfDaysAgo(40).getTime()
+      return supabaseClients.data.includes(index[0]) && indexDate.getTime() >= startOfDaysAgo(1).getTime()
     })
 
     // If new clients, add their index data to newIndexRows
@@ -126,6 +143,8 @@ export default defineEventHandler(async (event) => {
       const newClientIndex = indexData.filter(index => newClientsPds.includes(index[0]))
       newIndexRows.push(...newClientIndex)
     }
+
+    console.log('Number of indexs to be inserted in Supabase:', newIndexRows?.length)
 
     // Format newIndexRows for Supabase
     newIndexRows = newIndexRows.map(index => {
@@ -137,7 +156,6 @@ export default defineEventHandler(async (event) => {
         rank: toIntOrNull(index[6]),
         last_modified: formatDateWithTime(index[5], "+02:00").toISOString(),
         day: formatDateWithoutTime(index[7]),
-        daily_differential: toFloatOrNull(index[10]),
         pds: index[0]
       }
     })
@@ -147,8 +165,11 @@ export default defineEventHandler(async (event) => {
     // Find qmin data for existing clients
     newQminRows = qminData.filter(qmin => {
       const qminDate = formatDateWithTime(qmin[1])
-      return supabaseClients.data.includes(qmin[0]) && qminDate.getTime() >= startOfDaysAgo(42).getTime() && qminDate.getTime() < startOfDaysAgo(2).getTime()
+      return supabaseClients.data.includes(qmin[0]) && qminDate.getTime() >= startOfDaysAgo(3).getTime() && qminDate.getTime() < startOfDaysAgo(2).getTime()
     })
+
+    console.log('Number of qmins to be inserted in Supabase:', newQminRows?.length)
+    console.log('-----------------------------------------')
 
     // If new clients, add their qmin data to newQminRows
     if (newClients && newClientsPds.length > 0) {
@@ -168,19 +189,76 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Send data to Supabase
+  // Helper function to split array into chunks
+  const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
+    const chunks: T[][] = []
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize))
+    }
+    return chunks
+  }
+
+  // Helper function to insert data in chunks
+  const insertInChunks = async (
+    table: string,
+    data: any[],
+    chunkSize: number,
+    onConflict: string
+  ) => {
+    const chunks = chunkArray(data, chunkSize)
+    console.log(`Inserting ${data.length} rows into ${table} in ${chunks.length} chunks of ${chunkSize}`)
+    
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i]
+      const result = await supabase
+        .from(table)
+        .insert(chunk as any)
+        .select() as any
+      
+      if (result.error) {
+        throw new Error(`Error inserting chunk ${i + 1}/${chunks.length} into ${table}: ${result.error.message}`)
+      }
+      
+      console.log(`Successfully inserted chunk ${i + 1}/${chunks.length} into ${table} (${chunk.length} rows)`)
+    }
+  }
+
   try {
-    await Promise.all([
-      supabase.functions.invoke('clients-bulk-create', {
-        body: newClients,
-      }),
-      supabase.functions.invoke('indexs-bulk-create', {
-        body: newIndexRows,
-      }),
-      supabase.functions.invoke('qmins-bulk-create', {
-        body: newQminRows,
-      }),
-    ])
+    const BATCH_SIZE = 1000
+
+    if (Array.isArray(newClients) && newClients.length > 0) {
+      // Deduplicate by pds within the batch to avoid intra-batch duplicates
+      const seenPds = new Set<string>()
+      newClients = newClients.filter((c: any) => {
+        if (seenPds.has(c.pds)) return false
+        seenPds.add(c.pds)
+        return true
+      })
+      if (newClients.length <= BATCH_SIZE) {
+        const result = await supabase
+          .from('clients')
+          .upsert(newClients as any, { onConflict: 'pds', ignoreDuplicates: true } as any)
+          .select() as any
+        
+        if (result.error) {
+          throw new Error(`Error inserting clients: ${result.error.message}`)
+        }
+        console.log(`Successfully inserted ${newClients.length} clients`)
+      } else {
+        await insertInChunks('clients', newClients, BATCH_SIZE, 'pds')
+      }
+    }
+
+    // Insert indexs in chunks
+    if (Array.isArray(newIndexRows) && newIndexRows.length > 0) {
+      await insertInChunks('indexs', newIndexRows, BATCH_SIZE, 'pds,date_index')
+    }
+
+    // Insert qmins in chunks
+    if (Array.isArray(newQminRows) && newQminRows.length > 0) {
+      await insertInChunks('qmins', newQminRows, BATCH_SIZE, 'pds,reference_date')
+    }
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw createError({
@@ -188,5 +266,4 @@ export default defineEventHandler(async (event) => {
       statusMessage: `Failed to send data to Supabase: ${errorMessage}`
     })
   }
- 
 })

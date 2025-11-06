@@ -7,8 +7,6 @@ export default defineEventHandler(async (event): Promise<ServerResponse> => {
 
   const client = await serverSupabaseClient(event)
 
-  console.log('email', email)
-
   const { error } = await client.auth.signInWithOtp({
     email: email,
     options: {
