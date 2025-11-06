@@ -16,7 +16,7 @@ const forwarded = useForwardProps(delegatedProps)
   <ComboboxViewport
     data-slot="combobox-viewport"
     v-bind="forwarded"
-    :class="cn('max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto rounded-xl p-1 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800', props.class)"
+      :class="cn('max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto rounded-xl p-1 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 w-full max-sm:max-w-[var(--reka-combobox-trigger-width)]', props.class)"
   >
     <slot />
   </ComboboxViewport>

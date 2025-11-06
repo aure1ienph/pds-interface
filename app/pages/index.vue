@@ -82,8 +82,12 @@ watch(selectedPds, async (newValue: string | null) => {
 
 <template>
   <div class="container mx-auto w-11/12 max-w-7xl">
-    <div class="flex items-baseline gap-2">
-      <h1 class="text-black dark:text-white font-bold text-3xl mt-10">
+    <div class="flex max-sm:flex-col items-baseline gap-2">
+      <div class="flex items-center gap-2 max-sm:flex hidden py-2 w-full fixed top-0 bg-white dark:bg-black">
+        <ThemeSelector />
+        <SignOutButton />
+      </div>
+      <h1 class="text-black dark:text-white font-bold text-3xl mt-14 sm:mt-10">
         Interface consommation
       </h1>
       <span class="font-medium text-primary">
@@ -94,23 +98,23 @@ watch(selectedPds, async (newValue: string | null) => {
     <span class="text-zinc-700 dark:text-zinc-300 text-sm mt-2">
       Sélectionnez un immeuble pour suivre son niveau de consommation.
     </span>
-    <div class="flex gap-2 items-center mt-6 w-full justify-between">
+    <div class="flex max-sm:flex-col gap-2t sm:items-center mt-6 w-full justify-between">
 
-      <div class="flex gap-1">
+      <div class="flex max-sm:flex-col gap-1">
         <Combobox v-model="selectedBuilding" by="name" class="flex-1">
-          <ComboboxAnchor as-child class="w-fit min-w-[200px]">
+          <ComboboxAnchor as-child class="w-full sm:w-fit sm:min-w-[200px]">
             <ComboboxTrigger as-child>
               <div class="flex items-center justify-between cursor-pointer bg-zinc-100 dark:bg-zinc-900 py-2 px-3 rounded-full text-sm h-[30px] gap-2 hover:outline-1 outline-offset-2 outline-zinc-200 dark:outline-zinc-800">
                 <span class="truncate w-fit text-zinc-700 dark:text-zinc-300 text-[13px]">
-                  {{ selectedBuilding?.name ?? 'Sélectionner..' }}
+                  {{ selectedBuilding?.name ?? 'Sélectionner un immeuble..' }}
                 </span>
                 <ChevronDown class="size-3.5 text-zinc-700 dark:text-zinc-300" />
               </div>
             </ComboboxTrigger>
           </ComboboxAnchor>
 
-          <ComboboxList align="start" class="min-w-sm">
-            <ComboboxInput placeholder="Rechercher.." class="h-full" />
+          <ComboboxList align="start">
+            <ComboboxInput placeholder="Rechercher.." class="h-full max-sm:w-full" />
 
             <ComboboxEmpty>
               Pas d'immeuble trouvé..
@@ -134,8 +138,8 @@ watch(selectedPds, async (newValue: string | null) => {
           </ComboboxList>
         </Combobox>
 
-        <Select v-model="selectedPds">
-          <SelectTrigger class="w-[180px]">
+        <Select v-model="selectedPds" :disabled="!selectedBuilding?.pds.length">
+          <SelectTrigger class="w-full sm:w-[180px]">
             <SelectValue placeholder="Sélectionner un PDS" />
           </SelectTrigger>
           <SelectContent>
@@ -149,13 +153,13 @@ watch(selectedPds, async (newValue: string | null) => {
         </Select>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 max-sm:hidden">
         <ThemeSelector />
         <SignOutButton />
       </div>
     </div>
 
-    <div class="mt-6 flex flex-col w-full">
+    <div class="my-6 flex flex-col w-full">
       <div
         v-if="selectedBuilding"
         :key="selectedPds ?? ''"

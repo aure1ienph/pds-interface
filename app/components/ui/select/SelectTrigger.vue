@@ -21,7 +21,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     :data-size="size"
     v-bind="forwardedProps"
     :class="cn(
-      'rounded-full bg-zinc-100 dark:bg-zinc-900 py-2 px-3 text-sm h-[30px] gap-2 hover:outline-1 outline-offset-2 outline-zinc-200 dark:outline-zinc-800 flex items-center gap-2 justify-between text-[13px] text-zinc-700 dark:text-zinc-300 cursor-pointer',
+      'rounded-full bg-zinc-100 dark:bg-zinc-900 py-2 px-3 text-sm h-[30px] gap-2 hover:outline-1 outline-offset-2 outline-zinc-200 dark:outline-zinc-800 flex items-center gap-2 justify-between text-[13px] text-zinc-700 dark:text-zinc-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:outline-none',
       props.class,
     )"
   >
