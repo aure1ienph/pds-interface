@@ -31,7 +31,6 @@ const getIndexs = async () => {
   const { data } = await supabase
   .from('indexs')
   .select(`
-    daily_differential,
     date_index,
     index,
     clients (
