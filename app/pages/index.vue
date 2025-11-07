@@ -81,19 +81,10 @@ watch(selectedPds, async (newValue: string | null) => {
 </script>
 
 <template>
-  <div class="container mx-auto w-11/12 max-w-7xl">
-    <div class="flex max-sm:flex-col items-baseline gap-2">
-      <div class="flex items-center gap-2 max-sm:flex hidden py-2 w-full fixed top-0 bg-white dark:bg-black">
-        <ThemeSelector />
-        <SignOutButton />
-      </div>
-      <h1 class="text-black dark:text-white font-bold text-3xl mt-14 sm:mt-10">
-        Interface consommation
-      </h1>
-      <span class="font-medium text-primary">
-        par Impact Copro
-      </span>
-    </div>
+  <div class="pt-14 sm:pt-10">
+    <h1 class="text-black dark:text-white font-bold text-3xl">
+      Interface consommation
+    </h1>
 
     <span class="text-zinc-700 dark:text-zinc-300 text-sm mt-2">
       Sélectionnez un immeuble pour suivre son niveau de consommation.
@@ -151,11 +142,6 @@ watch(selectedPds, async (newValue: string | null) => {
             </SelectGroup>
           </SelectContent>
         </Select>
-      </div>
-
-      <div class="flex items-center gap-2 max-sm:hidden">
-        <ThemeSelector />
-        <SignOutButton />
       </div>
     </div>
 
@@ -222,4 +208,5 @@ watch(selectedPds, async (newValue: string | null) => {
       </div>
     </div>
   </div>
+  
 </template>

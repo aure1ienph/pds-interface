@@ -14,7 +14,10 @@ import type { ServerResponse } from '../../shared/types/serverResponse'
 const isDisabled = ref(false)
 
 const zodSchema = z.object({
-  email: z.string().email('Email invalide'),
+  email: z.preprocess(
+    (val) => val === undefined || val === null ? '' : val,
+    z.string().min(1, 'L\'email est requis').email('Email invalide')
+  ),
 })
 
 const formSchema = toTypedSchema(zodSchema)
