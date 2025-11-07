@@ -1,6 +1,6 @@
 import { getRowsFromSheet } from "../../../shared/utils/gSheet"
 import { serverSupabaseServiceRole } from '#supabase/server'
-import type { Client } from "../../../shared/types/clients"
+import type { Client } from "../../../shared/types/client"
 
 
 export default defineEventHandler(async (event) => {

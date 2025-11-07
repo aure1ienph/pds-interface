@@ -13,6 +13,7 @@
     "@nuxtjs/color-mode": "3.5.2",
     "@nuxtjs/supabase": "2.0.1",
     "@tailwindcss/vite": "^4.1.16",
+    "@tanstack/vue-table": "^8.21.3",
     "@unovis/ts": "^1.6.1",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.0.0",

@@ -7,6 +7,7 @@ import { Check, ChevronDown, DropletOff } from "lucide-vue-next"
 import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList, ComboboxTrigger, ComboboxViewport } from "@/components/ui/combobox"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Consumption from "@/components/consumption/Index.vue"
 
 // Types
 import type { Index } from '../../shared/types/index'
@@ -81,15 +82,16 @@ watch(selectedPds, async (newValue: string | null) => {
 </script>
 
 <template>
-  <div class="pt-14 sm:pt-10">
-    <h1 class="text-black dark:text-white font-bold text-3xl">
-      Interface consommation
-    </h1>
+  <div>
+    <div class="px-6 py-6 lg:py-10">
+      <h1 class="text-black dark:text-white font-bold text-3xl">
+       Suivi consommation
+      </h1>
+    </div>
 
-    <span class="text-zinc-700 dark:text-zinc-300 text-sm mt-2">
-      Sélectionnez un immeuble pour suivre son niveau de consommation.
-    </span>
-    <div class="flex max-sm:flex-col gap-2t sm:items-center mt-6 w-full justify-between">
+    <Consumption />
+
+    <!-- <div class="flex max-sm:flex-col gap-2t sm:items-center p-6 border-t border-dashed border-zinc-200 dark:border-zinc-800 w-full justify-between">
 
       <div class="flex max-sm:flex-col gap-1">
         <Combobox v-model="selectedBuilding" by="name" class="flex-1">
@@ -206,7 +208,7 @@ watch(selectedPds, async (newValue: string | null) => {
           Veuillez sélectionner un immeuble..
         </span>
       </div>
-    </div>
+    </div> -->
   </div>
   
 </template>
