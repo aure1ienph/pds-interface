@@ -8,11 +8,13 @@ const props = defineProps<{
   data: Qmin[]
 }>()
 
-// Data
-const data: ChartData[] = props.data.map((item) => ({
-  metering: item.qmin,
-  date: item.reference_date
-})).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+// Reactive data
+const data = computed<ChartData[]>(() => {
+  return props.data.map((item) => ({
+    metering: item.qmin,
+    date: item.reference_date
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+})
 
 // Chart configuration
 const categories: Record<string, BulletLegendItemInterface> = {
@@ -22,13 +24,13 @@ const categories: Record<string, BulletLegendItemInterface> = {
   }
 }
 
-const meteringValues = data.map(d => d.metering)
-const minValue = meteringValues.length > 0 ? Math.min(...meteringValues) : 0
-const maxValue = meteringValues.length > 0 ? Math.max(...meteringValues) : 100
-const yDomain: [number, number] = [minValue, maxValue]
+const meteringValues = computed(() => data.value.map(d => d.metering))
+const minValue = computed(() => meteringValues.value.length > 0 ? Math.min(...meteringValues.value) : 0)
+const maxValue = computed(() => meteringValues.value.length > 0 ? Math.max(...meteringValues.value) : 100)
+const yDomain = computed<[number, number]>(() => [minValue.value, maxValue.value])
 
 const xFormatter = (i: number) => {
-  const dateStr = data[i]?.date
+  const dateStr = data.value[i]?.date
   if (!dateStr) return ''
   const date = new Date(dateStr)
   return date.toLocaleString('fr-FR', { month: 'short', year: '2-digit' }).charAt(0).toUpperCase() + date.toLocaleString('fr-FR', { month: 'short', year: '2-digit' }).slice(1)

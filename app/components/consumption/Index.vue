@@ -8,7 +8,6 @@ import type { Consumption } from '../../../shared/types/consumption'
 import type { Building } from '../../../shared/types/building'
 
 const supabase = useSupabaseClient()
-
 const data = ref<pdsData[]>([])
 
 async function getData(): Promise<pdsData[]> {
@@ -38,16 +37,24 @@ async function getData(): Promise<pdsData[]> {
   return consumptionData.filter((item): item is pdsData => item.building !== undefined) as pdsData[]
 }
 
+const isLoading = ref(false)
+
 onMounted(async () => {
+  isLoading.value = true
   try {
-    data.value = await getData()
-    console.log(data.value)
+    const result = await getData()
+    data.value = result
   } catch (error) {
     console.error('Failed to load consumption data:', error)
+    data.value = []
+  } finally {
+    isLoading.value = false
   }
 })
 </script>
 
 <template>
-  <DataTable :columns="columns" :data="data" />
+  <div class="h-full">
+    <DataTable :columns="columns" :data="data" :isLoading="isLoading"/>
+  </div>
 </template>
