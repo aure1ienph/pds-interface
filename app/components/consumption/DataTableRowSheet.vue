@@ -4,6 +4,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { DropletOff } from "lucide-vue-next"
+import IndexChart from './DataTableIndexChart.vue'
+import QminChart from './DataTableQminChart.vue'
 
 // Utils
 import { formatDate } from '@/utils/formatDate'
