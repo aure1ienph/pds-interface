@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Types
-import type { Index } from '../../shared/types/index'
-import type { ChartData } from '../../shared/types/chartData'
+import type { Index } from '../../../shared/types/index'
+import type { ChartData } from '../../../shared/types/chartData'
 
 // Props
 const props = defineProps<{

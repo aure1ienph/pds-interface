@@ -3,14 +3,18 @@
 import DataTablePagination from './DataTablePagination.vue'
 import DataTableRowSheet from './DataTableRowSheet.vue'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { FlexRender, useVueTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/vue-table'
-import { valueUpdater } from '@/lib/utils'
 import { Spinner } from '@/components/ui/spinner'
-import Input from '@/components/ui/input/Input.vue'
+import { Input } from '@/components/ui/input'
 import { Empty, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { DropletOff, TriangleAlert } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+// Helper
+import { FlexRender, useVueTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/vue-table'
+import { valueUpdater } from '@/lib/utils'
+import { missionsStatusOptions } from './options'
 
 // Types
 import type { ColumnDef, ColumnSizingState, ColumnSizingInfoState, SortingState, ColumnFiltersState } from '@tanstack/vue-table'
@@ -68,6 +72,7 @@ const table = useVueTable({
   columnResizeMode: 'onChange',
 })
 
+// Computed properties
 const rowModel = computed(() => table.getRowModel())
 const rows = computed(() => rowModel.value.rows)
 const headerGroups = computed(() => table.getHeaderGroups())
@@ -85,39 +90,72 @@ const isSheetOpen = computed({
   },
 })
 
-// Filter state
-const filterValue = ref('')
+// Filters
+const searchFilterValue = ref('')
+const statusFilterValue = ref<string | null>(null)
 const showWarningRow = ref(false)
 
-watch(filterValue, (newVal) => {
-  // Filtrer sur la colonne virtuelle qui combine name et pds
+watch(searchFilterValue, (newVal) => {
   table.getColumn('name_or_pds')?.setFilterValue(newVal)
 })
 
-const toggleOldIndexDateFilter = () => {
+watch(statusFilterValue, (newVal) => {
+  if (newVal === null || newVal === 'all') {
+    table.getColumn('missions_status')?.setFilterValue(null)
+    // Réinitialiser le Select à null pour afficher le placeholder
+    if (newVal === 'all') {
+      nextTick(() => {
+        statusFilterValue.value = null
+      })
+    }
+  } else { 
+    table.getColumn('missions_status')?.setFilterValue(newVal)
+  }
+})
+
+const toggleWarningRowFilter = () => {
   showWarningRow.value = !showWarningRow.value
   table.getColumn('warning_row')?.setFilterValue(showWarningRow.value ? 'active' : '')
 }
+
 </script>
 
 <template>
   <div class="h-full flex flex-col">
+    <!-- Header -->
     <div class="flex-shrink-0 w-full border-b border-zinc-200 dark:border-zinc-800 border-dashed">
-      <div class="w-11/12 max-w-7xl mx-auto border-x border-zinc-200 dark:border-zinc-800 border-dashed px-6 py-6 flex max-md:flex-col max-md:items-start max-sm:justify-start items-center justify-between">
+      <div class="w-11/12 max-w-7xl mx-auto border-x border-zinc-200 dark:border-zinc-800 border-dashed px-6 py-6 flex max-lg:flex-col max-lg:gap-2 max-lg:items-start items-center justify-between">
         <h1 class="text-black dark:text-white font-bold text-3xl">
           Suivi consommation
         </h1>
-        <div class="flex items-center gap-2 py-4 w-full md:max-w-md">
+        <div class="flex max-sm:flex-col max-sm:items-start items-center lg:justify-end gap-2 w-full md:max-w-xl">
+          <!-- Status filter -->
+          <Select v-model="statusFilterValue">
+            <SelectTrigger class="max-sm:w-full w-40">
+              <SelectValue
+              placeholder="Filtrer par statut.."
+              :class="[
+                'truncate placeholder:text-zinc-500 dark:placeholder:text-zinc-400',
+                statusFilterValue ? 'text-black dark:text-white' : 'text-zinc-500 dark:text-zinc-400'
+              ]" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Réinitialiser</SelectItem>
+              <SelectItem v-for="status in missionsStatusOptions" :key="status" :value="status">{{ status }}</SelectItem>
+            </SelectContent>
+          </Select>
+          <div class="flex gap-2 grow max-sm:w-full sm:max-w-md">
+            <!-- Search -->
           <Input
             class="h-[30px] text-[13px] rounded-full gap-1.5 px-3 has-[>svg]:px-2.5 flex-1 w-full"
             placeholder="Rechercher par immeuble ou numéro de compteur.."
-            v-model="filterValue"
+            v-model="searchFilterValue"
           />
-
+          <!-- Warning row filter -->
           <HoverCard>
             <HoverCardTrigger>
               <Button
-                @click="toggleOldIndexDateFilter"
+                @click="toggleWarningRowFilter"
                 :variant="showWarningRow ? 'destructive' : 'outline'"
                 size="icon-sm"
                 class="h-[30px] text-[13px] border-red-200 dark:border-red-800"
@@ -129,11 +167,12 @@ const toggleOldIndexDateFilter = () => {
               Afficher les immeubles dont la date d'index ou de qmin est antérieure à 1 semaine.
             </HoverCardContent>
           </HoverCard>
-
-
+          </div>
+         
         </div>
       </div>
     </div>
+    <!-- Table -->
     <div
       v-if="hasRows && !isLoading"
       class="flex-1 min-h-0 border-x border-zinc-200 dark:border-zinc-800 border-dashed w-11/12 max-w-7xl mx-auto"
@@ -148,11 +187,15 @@ const toggleOldIndexDateFilter = () => {
             <TableHead 
               v-for="(header, headerIndex) in headerGroup.headers"
               :key="header.id"
-              :style="{ width: `${header.getSize()}px`, left: headerIndex === 0 ? '0px' : '',   zIndex: headerIndex === 0 ? 40 : 20, }"
+              :style="{ 
+                width: `${header.getSize()}px`,
+                left: headerIndex === 0 ? '0px' : '',
+                zIndex: headerIndex === 0 ? 40 : 20
+              }"
               :class="[
                 'px-4 relative sticky top-0 z-20 bg-zinc-50 dark:bg-zinc-950',
-                headerIndex === headerGroup.headers.length - 1 ? 'pr-6' : 'border-r border-dashed border-zinc-200 dark:border-zinc-800',
-
+                headerIndex === headerGroup.headers.length - 1 ? 'pr-6' :
+                'border-r border-dashed border-zinc-200 dark:border-zinc-800'
               ]"
             >
               <FlexRender
@@ -181,7 +224,12 @@ const toggleOldIndexDateFilter = () => {
               <TableCell 
                 v-for="(cell, cellIndex) in row.getVisibleCells()" 
                 :key="cell.id"
-                :style="{ width: `${cell.column.getSize()}px`, position: cellIndex === 0 ? 'sticky' : '', left: cellIndex === 0 ? '0px' : '',   zIndex: cellIndex === 0 ? 30 : 10, }"
+                :style="{ 
+                  width: `${cell.column.getSize()}px`,
+                  position: cellIndex === 0 ? 'sticky' : '',
+                  left: cellIndex === 0 ? '0px' : '',
+                  zIndex: cellIndex === 0 ? 30 : 10
+                }"
                 :class="[
                   'overflow-hidden last:pr-6 px-4 bg-white border-r border-dashed border-zinc-200 dark:border-zinc-800 dark:bg-black group-hover:bg-zinc-100 dark:group-hover:bg-zinc-900 min-w-0 overflow-hidden group-hover:bg-zinc-50 dark:group-hover:bg-zinc-950 group-hover:cursor-pointer',
                   cellIndex === 0 ? 'shadow-xs' : ''
@@ -194,14 +242,14 @@ const toggleOldIndexDateFilter = () => {
         </TableBody>
       </Table>
     </div>
-
+    <!-- Loading state -->
     <div v-if="isLoading && !hasRows" class="flex-1 min-h-0 w-11/12 max-w-7xl mx-auto border-x border-zinc-200 dark:border-zinc-800 border-dashed flex items-center justify-center gap-2 text-center">
       <Spinner class="size-4" />
       <span class="text-sm">
         Récupération des données..
       </span>
     </div>
-
+    <!-- Empty state -->
     <div v-else-if="!isLoading && !hasRows" class="flex-1 min-h-0 w-11/12 max-w-7xl mx-auto border-x border-zinc-200 dark:border-zinc-800 border-dashed flex items-center justify-center gap-2 text-center">
       <Empty>
         <EmptyHeader>
@@ -212,7 +260,6 @@ const toggleOldIndexDateFilter = () => {
               </div>
             </EmptyMedia>
             <EmptyTitle class="text-lg font-bold">Aucune donnée</EmptyTitle>
-
           </div>
           <EmptyDescription>
             Aucun immeuble ou numéro de compteur ne correspond à votre recherche.
@@ -220,16 +267,16 @@ const toggleOldIndexDateFilter = () => {
         </EmptyHeader>
       </Empty>
     </div>
+    <!-- Pagination -->
     <div class="flex-shrink-0 border-t border-zinc-200 dark:border-zinc-800 border-dashed" v-if="hasRows">
       <div class="w-11/12 max-w-7xl mx-auto border-x border-zinc-200 dark:border-zinc-800 border-dashed">
         <DataTablePagination :table="table" />
       </div>
     </div>
-
+    <!-- Row sheet -->
     <DataTableRowSheet
       :pds="pds"
       v-model:isOpen="isSheetOpen"
     />
-    
   </div>
 </template>

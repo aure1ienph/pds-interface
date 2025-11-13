@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Consumption from "@/components/consumption/Index.vue"
-
 </script>
 
 <template>

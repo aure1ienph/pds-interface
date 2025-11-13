@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Types
-import type { Qmin } from '../../shared/types/qmin'
-import type { ChartData } from '../../shared/types/chartData'
+import type { Qmin } from '../../../shared/types/qmin'
+import type { ChartData } from '../../../shared/types/chartData'
 
 // Props
 const props = defineProps<{

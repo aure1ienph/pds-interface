@@ -1,27 +1,15 @@
-import type { pdsData } from '../../../shared/types/pdsData'
-import type { ColumnDef } from '@tanstack/vue-table'
+// Components
 import TagBadge from '../TagBadge.vue'
 import { ArrowUpDown } from 'lucide-vue-next'
-import { toRaw } from 'vue'
 
-// Helper function to check if a date is older than one week
-function isDateOlderThanOneWeek(dateString: string | null | undefined): boolean {
-  if (!dateString) return false
-  
-  try {
-    const cleanedDateString = String(dateString).replace(/"T"/g, 'T').replace(/"Z"/g, 'Z')
-    const date = new Date(cleanedDateString)
-    
-    if (isNaN(date.getTime())) return false
-    
-    const oneWeekAgo = new Date()
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-    
-    return date < oneWeekAgo
-  } catch {
-    return false
-  }
-}
+// Types
+import type { pdsData } from '../../../shared/types/pdsData'
+import type { ColumnDef } from '@tanstack/vue-table'
+
+// Utils
+import { isDateOlderThanOneWeek } from '@/utils/isDateOlderThanOneWeek'
+import { formatDate } from '@/utils/formatDate'
+import { toRaw } from 'vue'
 
 export const columns: ColumnDef<pdsData>[] = [
   {
@@ -48,24 +36,7 @@ export const columns: ColumnDef<pdsData>[] = [
       const lastIndexDate = row.original.consumption?.last_index_date
       const lastQminDate = row.original.consumption?.last_qmin_date
       
-      if (!lastIndexDate && !lastQminDate) return false
-
-      try {
-        const qminStringDate = String(lastQminDate).replace(/"T"/g, 'T').replace(/"Z"/g, 'Z')
-        const indexStringDate = String(lastIndexDate).replace(/"T"/g, 'T').replace(/"Z"/g, 'Z')
-
-        const indexDate = new Date(indexStringDate)
-        const qminDate = new Date(qminStringDate)
-        
-        if (isNaN(indexDate.getTime()) || isNaN(qminDate.getTime())) return false
-        
-        const oneWeekAgo = new Date()
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-      
-        return indexDate < oneWeekAgo || qminDate < oneWeekAgo
-      } catch {
-        return false
-      }
+      return isDateOlderThanOneWeek(lastIndexDate) || isDateOlderThanOneWeek(lastQminDate)
     },
   },
   {
@@ -289,6 +260,17 @@ export const columns: ColumnDef<pdsData>[] = [
   {
     id: 'missions_status',
     accessorFn: (row) => row.building.missions_status,
+    enableColumnFilter: true,
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === '' || filterValue === 'all') return true
+      
+      const missions_status = row.original.building?.missions_status
+      if (!missions_status || !Array.isArray(missions_status)) {
+        return false
+      }
+      
+      return missions_status.includes(filterValue)
+    },
     header: () => h('div', { class: 'text-start truncate' }, 'Status des missions'),
     cell: ({ row }) => {
       const rawData = toRaw(row.original)
