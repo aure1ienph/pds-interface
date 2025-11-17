@@ -133,6 +133,37 @@ export const columns: ColumnDef<pdsData>[] = [
     },
   },
   {
+    id: 'index_j1_by_loft',
+    accessorFn: (row) => {
+      if (row.consumption.index_daily_differential && row.building.number_of_lofts > 0) {
+        return (row.consumption.last_index - row.consumption.index_daily_differential) / row.building.number_of_lofts
+      }
+      return null
+    },
+    header: ({ column }) => {
+      return h('div', {
+        onClick: () => column.toggleSorting(),
+        class: 'text-start truncate cursor-pointer flex items-center justify-between gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:outline-1 hover:outline-offset-2 hover:outline-zinc-200 dark:hover:outline-zinc-800 transition-all duration-200 ease-in-out px-2 py-0.5 rounded-full'
+      }, [
+        h('span', { class: 'text-start truncate' }, 'Index: différentiel J-1 par lot'),
+        h(ArrowUpDown, { class: 'size-3.5 shrink-0' })
+      ])
+    },
+    cell: ({ row }) => {
+      const rawData = toRaw(row.original)
+      let index_j1 = null
+      if (rawData.consumption?.index_daily_differential != null && rawData.consumption?.last_index != null && rawData.building?.number_of_lofts > 0) {
+        index_j1 = ((rawData.consumption.last_index - rawData.consumption.index_daily_differential) / rawData.building.number_of_lofts).toFixed(2)
+      }
+      return h('div', 
+        { 
+          class: index_j1 && Number(index_j1) > 50 ? 'text-start text-red-500' :
+          index_j1 && Number(index_j1) < -50 ? 'text-start text-green-500' :
+          'text-start'
+        }, index_j1 ?? '')
+    },
+  },
+  {
     id: 'index_j7',
     accessorFn: (row) => {
       if (row.consumption.index_weekly_differential) {
@@ -154,6 +185,37 @@ export const columns: ColumnDef<pdsData>[] = [
       let index_j7 = null
       if (rawData.consumption?.index_weekly_differential != null && rawData.consumption?.last_index != null) {
         index_j7 = (rawData.consumption.last_index - rawData.consumption.index_weekly_differential).toFixed(2)
+      }
+      return h('div', 
+        { 
+          class: index_j7 && Number(index_j7) >= 50 ? 'text-start text-red-500' :
+          index_j7 && Number(index_j7) <= -50 ? 'text-start text-green-500' :
+          'text-start'
+        }, index_j7 ?? '')
+    },
+  },
+  {
+    id: 'index_j7_by_loft',
+    accessorFn: (row) => {
+      if (row.consumption.index_weekly_differential && row.building.number_of_lofts > 0) {
+        return (row.consumption.last_index - row.consumption.index_weekly_differential) / row.building.number_of_lofts
+      }
+      return null
+    },
+    header: ({ column }) => {
+      return h('div', {
+        onClick: () => column.toggleSorting(),
+        class: 'text-start truncate cursor-pointer flex items-center justify-between gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:outline-1 hover:outline-offset-2 hover:outline-zinc-200 dark:hover:outline-zinc-800 transition-all duration-200 ease-in-out px-2 py-0.5 rounded-full'
+      }, [
+        h('span', { class: 'text-start truncate' }, 'Index: différentiel J-7 par lot'),
+        h(ArrowUpDown, { class: 'size-3.5 shrink-0' })
+      ])
+    },
+    cell: ({ row }) => {
+      const rawData = toRaw(row.original)
+      let index_j7 = null
+      if (rawData.consumption?.index_weekly_differential != null && rawData.consumption?.last_index != null && rawData.building?.number_of_lofts > 0) {
+        index_j7 = ((rawData.consumption.last_index - rawData.consumption.index_weekly_differential) / rawData.building.number_of_lofts).toFixed(2)
       }
       return h('div', 
         { 
