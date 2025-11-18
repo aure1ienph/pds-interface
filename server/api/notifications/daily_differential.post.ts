@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await resend.emails.send({
       from: 'Impact Copro <noreply@impact-copro.com>',
       to: recipient,
-      subject: 'Interface consommation : Notification de différentiel quotidien',
+      subject: 'Interface consommation : Notification de différentiel hebdomadaire',
       html: html,
     });
   
@@ -116,31 +116,20 @@ export default defineEventHandler(async (event) => {
         <tr style="background-color:#f9fafb;">
           <th style="padding:12px; text-align:left; color:#000000; width:30%; font-weight:500;">Immeuble</th>
           <th style="padding:12px; text-align:left; color:#000000; width:20%; font-weight:500;">Compteur</th>
-          <th style="padding:12px; text-align:left; color:#000000; width:12.5%; font-weight:500;">I.J-1</th>
           <th style="padding:12px; text-align:left; color:#000000; width:12.5%; font-weight:500;">I.J-7</th>
-          <th style="padding:12px; text-align:left; color:#000000; width:12.5%; font-weight:500;">Q.J-1</th>
           <th style="padding:12px; text-align:left; color:#000000; width:12.5%; font-weight:500;">Q.J-7</th>
         </tr>
       </thead>
       <tbody>
-        ${warningData.map((item, index) => {
-          const indexJ1 = getIndexJ1(item)
+        ${warningData.map((item) => {
           const indexJ7 = getIndexJ7(item)
-          const qminJ1 = getQminJ1(item)
           const qminJ7 = getQminJ7(item)
-          
           return `
           <tr style="border-bottom:1px solid #e5e7eb;">
             <td style="padding:12px; color:#000000; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0;">${item.building?.name ?? ''}</td>
             <td style="padding:12px; color:#000000; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0;">${item.consumption?.pds ?? ''}</td>
-            <td style="padding:12px; text-align:left; color:${getDifferentialColor(indexJ1)};">
-              ${indexJ1 || '-'}
-            </td>
             <td style="padding:12px; text-align:left; color:${getDifferentialColor(indexJ7)};">
               ${indexJ7 || '-'}
-            </td>
-            <td style="padding:12px; text-align:left; color:${getDifferentialColor(qminJ1)};">
-              ${qminJ1 || '-'}
             </td>
             <td style="padding:12px; text-align:left; color:${getDifferentialColor(qminJ7)};">
               ${qminJ7 || '-'}

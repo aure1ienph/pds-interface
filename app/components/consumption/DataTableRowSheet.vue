@@ -117,13 +117,42 @@ const qminDailyDiffClass = computed(() => {
   return ''
 })
 
+const indexWeeklyDiffClass = computed(() => {
+  if (props.pds?.consumption?.last_index == null || props.pds?.consumption?.index_weekly_differential == null) {
+    return ''
+  }
+  const diff = props.pds.consumption.last_index - props.pds.consumption.index_weekly_differential
+  if (diff >= 50) return 'text-red-500'
+  if (diff <= -50) return 'text-green-500'
+  return ''
+})
+
+const qminWeeklyDiffClass = computed(() => {
+  if (props.pds?.consumption?.last_qmin == null || props.pds?.consumption?.qmin_weekly_differential == null) {
+    return ''
+  }
+  const diff = props.pds.consumption.last_qmin - props.pds.consumption.qmin_weekly_differential
+  if (diff >= 50) return 'text-red-500'
+  if (diff <= -50) return 'text-green-500'
+  return ''
+})
 </script>
 
 <template>
  <Sheet v-model:open="openProxy" :modal="false">
     <SheetContent @pointer-down-outside="preventSheetCloseOnTableClick" class="overflow-y-auto">
       <SheetHeader class="p-0">
-        <SheetTitle class="text-2xl font-bold">{{ props.pds?.building?.name }}</SheetTitle>
+        <div class="flex gap-4 items-center">
+          <SheetTitle class="text-2xl font-bold">{{ props.pds?.building?.name }}</SheetTitle>
+          <div class="flex gap-2">
+            <TagBadge 
+              v-if="props.pds?.building?.missions_status"
+              v-for="status in props.pds?.building?.missions_status"
+              field="missions_status"
+              :value="status"
+            />
+          </div>
+        </div>
         <SheetDescription>
           Numéro de compteur : <span class="font-bold text-primary">{{ props.pds?.consumption?.pds }}</span>
         </SheetDescription>
@@ -159,10 +188,10 @@ const qminDailyDiffClass = computed(() => {
             </TableRow>
             <TableRow class="border-zinc-200 border-dashed dark:border-zinc-800">
               <TableCell class="text-start truncate">Différentiel j-7</TableCell>
-              <TableCell class="text-start truncate" :class="props.pds?.consumption?.index_weekly_differential != null && Number(props.pds.consumption.index_weekly_differential) >= 50 ? 'text-red-500' : props.pds?.consumption?.index_weekly_differential != null && Number(props.pds.consumption.index_weekly_differential) <= -50 ? 'text-green-500' : ''">
+              <TableCell class="text-start truncate" :class="indexWeeklyDiffClass">
                 {{ props.pds?.consumption?.last_index != null && props.pds?.consumption?.index_weekly_differential != null ? (props.pds.consumption.last_index - props.pds.consumption.index_weekly_differential).toFixed(2) : '' }}
               </TableCell>
-              <TableCell class="text-start truncate" :class="props.pds?.consumption?.qmin_weekly_differential != null && Number(props.pds.consumption.qmin_weekly_differential) >= 50 ? 'text-red-500' : props.pds?.consumption?.qmin_weekly_differential != null && Number(props.pds.consumption.qmin_weekly_differential) <= -50 ? 'text-green-500' : ''">
+              <TableCell class="text-start truncate" :class="qminWeeklyDiffClass">
                 {{ props.pds?.consumption.last_qmin != null && props.pds?.consumption?.qmin_weekly_differential != null ? (props.pds.consumption.last_qmin - props.pds.consumption.qmin_weekly_differential).toFixed(2) : '' }}
               </TableCell>
             </TableRow>
