@@ -2,8 +2,8 @@ import { Resend } from 'resend'
 import { serverSupabaseServiceRole } from '#supabase/server'
 import { getPdsData } from "#shared/utils/getPdsData"
 import type { Building } from '../../../shared/types/building'
-import path from 'path'
-import fs from 'fs'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 
 const config = useRuntimeConfig()
 const resend = new Resend(config.resendApiKey)
@@ -64,8 +64,8 @@ export default defineEventHandler(async (event) => {
   
   }
 
-  const templatePath = path.join(process.cwd(), "server/emails/daily_notification.html")
-  let html = fs.readFileSync(templatePath, "utf8")
+  const filePath = path.resolve('public/templates/emails/daily_notification.html')
+  let html = readFileSync(filePath, 'utf8')
 
   html = html.replace('{{ date }}', new Date().toLocaleDateString('fr-FR'))
   
