@@ -1,40 +1,25 @@
 <script setup lang="ts">
-import { columns } from './columns'
+// Components
 import DataTable from './DataTable.vue'
 
 // Types
 import type { pdsData } from '../../../shared/types/pdsData'
-import type { Consumption } from '../../../shared/types/consumption'
 import type { Building } from '../../../shared/types/building'
+
+// Utils
+import { getPdsData } from '../../../shared/utils/getPdsData'
+import { columns } from './columns'
 
 const supabase = useSupabaseClient()
 const data = ref<pdsData[]>([])
 
 async function getData(): Promise<pdsData[]> {
-  const { data: consumption, error } = await supabase.rpc('get_consumptions')
-  
-  if (error) {
-    throw error
-  }
-
-  const consumptionArray = (consumption as Consumption[]) || []
-  const pdsList = consumptionArray.map((item: Consumption) => item.pds)
-
-  const buildings = await $fetch<Building[]>('/api/buildings', {
-    method: 'POST',
-    body: {
-      pds: pdsList
-    }
+  return getPdsData(supabase, async (pdsList: string[]) => {
+    return await $fetch<Building[]>('/api/buildings', {
+      method: 'POST',
+      body: { pds: pdsList }
+    })
   })
-
-  const consumptionData = consumptionArray.map((consumption: Consumption) => {
-    return {
-      consumption: consumption,
-      building: buildings.find((building: Building) => building.pds.includes(consumption.pds)),
-    }
-  })
-
-  return consumptionData.filter((item): item is pdsData => item.building !== undefined) as pdsData[]
 }
 
 const isLoading = ref(false)

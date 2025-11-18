@@ -121,10 +121,10 @@ watch(userObject, (data) => {
           <FormItem class="flex max-sm:flex-col max-sm:items-start flex-row items-center justify-between rounded-lg border border-zinc-200 dark:border-zinc-800 border-dashed px-4 py-2">
             <div class="space-y-0.5">
               <FormLabel class="text-xs sm:text-sm">
-                Notifications de différentiel quotidien
+                Notifications de différentiel hebdomadaire
               </FormLabel>
               <FormDescription class="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300">
-                Recevez une notification par email lorsque le différentiel quotidien est supérieur à 50.
+                Recevez une notification par email lorsque le différentiel hebdomadaire est supérieur à 50.
               </FormDescription>
             </div>
             <FormControl>

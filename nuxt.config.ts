@@ -6,6 +6,8 @@ export default defineNuxtConfig({
     airtableAccessToken: process.env.AIRTABLE_ACCESS_TOKEN,
     googleCredentials: process.env.GOOGLE_CREDENTIALS,
     supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
+    appApiKey: process.env.APP_API_KEY,
+    resendApiKey: process.env.RESEND_API_KEY,
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
