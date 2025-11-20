@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
     
     const records = await base("tblQeMdTYx3mDfWnU").select({
       filterByFormula: "NOT({// N° PDS} = '')",
-      fields: ["// N° PDS", "ID interne", "Statut missions", "// Nbre lots terrain"]
+      fields: ["// N° PDS", "ID interne", "// Statut de la dernière mission", "// Nbre lots terrain"]
     }).all()
 
     let buildings = records.map(record => ({ 
       name: record.get("ID interne"), 
       pds: record.get("// N° PDS") as string,
       number_of_lofts: record.get("// Nbre lots terrain") as number,
-      missions_status: record.get("Statut missions") as string,
+      missions_status: record.get("// Statut de la dernière mission") as string,
     }))
 
     if (pds.length > 0) {

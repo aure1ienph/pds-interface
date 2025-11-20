@@ -333,11 +333,11 @@ export const columns: ColumnDef<pdsData>[] = [
       
       return missions_status.includes(filterValue)
     },
-    header: () => h('div', { class: 'text-start truncate' }, 'Status des missions'),
+    header: () => h('div', { class: 'text-start truncate' }, 'Statut dernière mission'),
     cell: ({ row }) => {
       const rawData = toRaw(row.original)
       const missions_status = rawData.building?.missions_status
-      if (!missions_status || !Array.isArray(missions_status)) {
+      if (!missions_status) {
         return h('div', { class: 'flex gap-2 justify-end' }, '')
       }
       return h('div', { class: 'flex gap-2 justify-end' }, 
