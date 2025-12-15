@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import { MoveLeft } from 'lucide-vue-next';
 import { PinInput, PinInputGroup, PinInputSlot } from "@/components/ui/pin-input"
+import { toast } from 'vue-sonner'
 
 const supabase = useSupabaseClient()
 
@@ -16,9 +17,10 @@ const handleComplete = async (e: string[]) => {
   const { error } = await supabase.auth.verifyOtp({ email: props.email, token, type: 'email' })
   
   if (error) {
-    console.error(error.message)
+    toast.error(error.message || 'Une erreur est survenue')
     return
-  } else {
+  } else {  
+    toast.success('Vous êtes connecté avec succès')
     return navigateTo('/')
   }
 }

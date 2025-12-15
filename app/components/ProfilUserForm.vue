@@ -39,12 +39,14 @@ const form = useForm<FormValues>({
 const getUserData = async () => { 
   const { data } = await supabase
   .from('profiles').select('id, first_name, last_name, email, daily_differential_warning_notification')
+  .eq('user_id', user?.value?.sub as string)
   .single()
 
   return data ? data as unknown as User : null
 }
 
 const updateProfile = async (values: FormValues) => {
+  console.log(user?.value?.sub)
   const { data, error } = await supabase
     .from('profiles')
     .update(values as never)

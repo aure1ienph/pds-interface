@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const protectedPaths = ['/team']
   if (!protectedPaths.includes(to.path)) return
 
-  const allowedCallerRoles = ['user']
+  const allowedCallerRoles = ['admin']
   const isUserAdmin = (role: string) => allowedCallerRoles.includes(role)
 
   const { initializeUserData, getUserData, isUserDataInitialized } = useJwtData()

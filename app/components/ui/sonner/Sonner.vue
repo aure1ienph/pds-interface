@@ -1,42 +1,30 @@
 <script lang="ts" setup>
-import type { ToasterProps } from "vue-sonner"
-import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon, XIcon } from "lucide-vue-next"
-import { Toaster as Sonner } from "vue-sonner"
-import { cn } from "@/lib/utils"
-
-const props = defineProps<ToasterProps>()
-</script>
-
-<template>
-  <Sonner
-    :class="cn('toaster group', props.class)"
-    :style="{
-      '--normal-bg': 'var(--popover)',
-      '--normal-text': 'var(--popover-foreground)',
-      '--normal-border': 'var(--border)',
-      '--border-radius': 'var(--radius)',
-    }"
-    v-bind="props"
-  >
-    <template #success-icon>
-      <CircleCheckIcon class="size-4" />
-    </template>
-    <template #info-icon>
-      <InfoIcon class="size-4" />
-    </template>
-    <template #warning-icon>
-      <TriangleAlertIcon class="size-4" />
-    </template>
-    <template #error-icon>
-      <OctagonXIcon class="size-4" />
-    </template>
-    <template #loading-icon>
-      <div>
-        <Loader2Icon class="size-4 animate-spin" />
-      </div>
-    </template>
-    <template #close-icon>
-      <XIcon class="size-4" />
-    </template>
-  </Sonner>
-</template>
+  import type { ToasterProps } from "vue-sonner"
+  import { Toaster as Sonner } from "vue-sonner"
+  import { computed } from "vue"
+  
+  const props = defineProps<ToasterProps>()
+  
+  type SonnerTheme = 'light' | 'dark' | 'system'
+  
+  const colorMode = useColorMode()
+  const sonnerTheme = computed<SonnerTheme>(() => {
+    const pref = colorMode.preference as string
+    if (pref === 'dark' || pref === 'light' || pref === 'system') return pref as SonnerTheme
+    return colorMode.value === 'dark' ? 'dark' : 'light'
+  })
+  </script>
+  
+  <template>
+    <Sonner
+      class="toaster group"
+      v-bind="props"
+      :toast-options="{
+        class: 'custom-toast',
+        style: {
+          padding: '8px 16px 8px 16px',
+        }
+      }"
+      :theme="sonnerTheme"
+    />
+  </template>
