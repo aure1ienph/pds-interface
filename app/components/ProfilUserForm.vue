@@ -3,6 +3,7 @@
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { toast } from 'vue-sonner'
 
 // Types
 import type { User } from '../../shared/types/user'
@@ -49,6 +50,12 @@ const updateProfile = async (values: FormValues) => {
     .update(values as never)
     .eq('user_id', user?.value?.sub as string)
     .select()
+
+  if (error) {
+    toast.error(error.message)
+  } else {
+    toast.success('Profil mis à jour avec succès')
+  }
 }
 
 const onSubmit = form.handleSubmit(async (values) => {
