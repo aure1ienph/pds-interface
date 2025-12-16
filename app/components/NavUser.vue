@@ -17,7 +17,6 @@ onMounted(async () => {
     await initializeUserData()
   }
   userData.value = await getUserData()
-  console.log(userData.value)
 })
 </script>
 

@@ -19,7 +19,7 @@ definePageMeta({
         <h2 class="text-black dark:text-white font-semibold text-lg">Gérer les accès</h2>
       </div>
       <div class="w-full lg:w-2/3 px-6 py-6">
-
+        <Users />
       </div>
     </div>
 
