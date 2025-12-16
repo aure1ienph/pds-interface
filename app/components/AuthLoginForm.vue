@@ -74,13 +74,13 @@ const authCheck = async(values: z.infer<typeof zodSchema>) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="m@example.com" v-bind="componentField" required/>
+                <Input type="email" placeholder="m@example.com" v-bind="componentField" required class="w-full h-[30px]" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
           
-          <Button type="submit" class="w-full" :disabled="isDisabled">
+          <Button type="submit" class="w-full h-[30px]" :disabled="isDisabled">
             Se connecter
           </Button>
         </div>

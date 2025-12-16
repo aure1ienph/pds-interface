@@ -2,6 +2,7 @@
   import type { ColumnDef } from '@tanstack/vue-table'
   import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table'
   import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+  // @ts-expect-error - Vue component import
   import DataTablePagination from './DataTablePagination.vue'
   import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
   

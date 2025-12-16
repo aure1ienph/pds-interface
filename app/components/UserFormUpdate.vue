@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { toast } from 'vue-sonner'
+import { RefreshCw } from 'lucide-vue-next';
 
 // Types
 import type { User } from '../../shared/types/user'
@@ -93,7 +94,7 @@ watch(userObject, (data) => {
         <FormItem class="w-full">
           <FormLabel>Prénom</FormLabel>
           <FormControl>
-            <Input id="first_name" type="text" required v-bind="componentField"/>
+            <Input id="first_name" type="text" required v-bind="componentField" class="w-full h-[30px]" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -103,7 +104,7 @@ watch(userObject, (data) => {
         <FormItem class="w-full">
           <FormLabel>Nom</FormLabel>
           <FormControl>
-            <Input id="last_name" type="text" required v-bind="componentField"/>
+            <Input id="last_name" type="text" required v-bind="componentField" class="w-full h-[30px]" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -114,7 +115,7 @@ watch(userObject, (data) => {
       <FormItem class="w-full">
         <FormLabel>Email</FormLabel>
         <FormControl>
-          <Input id="email" type="email" :value="userObject?.email || ''" disabled="true" v-bind="componentField"/>
+          <Input id="email" type="email" :value="userObject?.email || ''" disabled="true" v-bind="componentField" class="w-full h-[30px]" />
         </FormControl>
         <FormMessage />
       </FormItem>
@@ -149,7 +150,8 @@ watch(userObject, (data) => {
       </div>
     </div>
 
-    <Button type="submit" class="w-fit max-sm:w-full cursor-pointer mt-4" :disabled="disabledSubmitButton">
+    <Button type="submit" class="w-fit max-sm:w-full cursor-pointer mt-4 h-[30px]" :disabled="disabledSubmitButton">
+      <RefreshCw class="size-3.5" />
       Mettre à jour
     </Button>
   </form>

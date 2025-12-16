@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { User } from '../../../shared/types/user'
 import { h } from 'vue'
+// @ts-expect-error - Vue component import
 import DropdownAction from './DataTableDropdown.vue'
+// @ts-expect-error - Vue component import
 import DataTableRoleSelect from './DataTableRoleSelect.vue'
 
 export const columns = (

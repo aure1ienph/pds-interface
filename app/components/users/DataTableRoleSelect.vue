@@ -18,7 +18,6 @@
   const { getUserData } = useJwtData()
   const props = defineProps<Props>()
   
-  const pendingRole = ref<string | null>(null)
   const isUpdating = ref(false)
   
   const handleRoleUpdate = async (newRole: string) => {
@@ -28,7 +27,7 @@
   const updateUserRole = async (role: string) => {
     isUpdating.value = true
     try {
-      const response = await $fetch<ServerResponse>('/api/supabase/users/update', {
+      const response = await $fetch<ServerResponse>('/api/users/update', {
         method: 'POST',
         body: {
           user_id: props.userId,
@@ -64,9 +63,13 @@
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="admin">
+            <div class="h-2 w-2 rounded-full bg-red-500">
+            </div>
             Admin
           </SelectItem>
           <SelectItem value="user">
+            <div class="h-2 w-2 rounded-full bg-blue-500">
+            </div>
             Lecteur·rice
           </SelectItem>
         </SelectContent>

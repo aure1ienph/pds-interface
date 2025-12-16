@@ -8,6 +8,7 @@
   // Types
   import type { ServerResponse } from '../../../shared/types/serverResponse'
   
+  const user = useSupabaseUser()
   const { getUserData } = useJwtData()
   
   const props = defineProps<{
@@ -18,13 +19,12 @@
     refreshUsers?: () => void
   }>()
   
-  const deleteUser = async (userId: string, access: string) => {
+  const deleteUser = async (userId: string) => {
     try {
-      const response = await $fetch<ServerResponse>('/api/supabase/users/delete', {
+      const response = await $fetch<ServerResponse>('/api/users/delete', {
         method: 'POST',
         body: {
           user_id: userId,
-          access: access
         }
       })
       if (response.success) {
@@ -52,10 +52,11 @@
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem @click="deleteUser(props.user.id, props.user.access)"
-        :disabled="getUserData().access === props.user.access"
+        <DropdownMenuItem @click="deleteUser(props.user.id)"
+        :disabled="user?.sub === props.user.id"
+        variant="destructive"
         >
-          Supprimer l'utilisateur·rice
+          Supprimer
         </DropdownMenuItem>     
       </DropdownMenuContent>
     </DropdownMenu>
