@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     });
   
     if (error) {
-      return console.error({ error });
+      throw error
     }
   
   }
@@ -212,7 +212,13 @@ export default defineEventHandler(async (event) => {
   `
   html = html.replace('{{ qminTable }}', qminHtmlTable)
 
-  recipientsList?.forEach(async (recipient) => {
-    await sendNotification(recipient, html)
-  })
+  if (recipientsList?.length) {
+    await Promise.all(
+      recipientsList.map((recipient) =>
+        sendNotification(recipient, html)
+      )
+    )
+  }
+  
+  return { success: true }
 })
